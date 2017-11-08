@@ -52,7 +52,28 @@ open class DSSwipableFilterView: UIView {
         presentData()
     }
     
+    open func getFilteredImage() -> UIImage {
+        let filterImage = filterView.getFilteredCapturedImage()
+        UIGraphicsBeginImageContextWithOptions(frame.size, false, UIScreen.main.scale)
+        let context = UIGraphicsGetCurrentContext()
+        
+        filterImage.draw(in: bounds)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image!
+    }
+    
     open func setRenderImage(image: CIImage){
+        renderImage(image: image)
+    }
+    
+    open func setRenderImage(image: UIImage) {
+        let ciImage = CIImage(cgImage: image.cgImage!)
+        let fixedImage = ciImage.transformed(by: image.transformToFixImage())
+        setRenderImage(image: fixedImage)
+    }
+    
+    fileprivate func renderImage(image: CIImage) {
         filterView.setRenderImage(image: isPlayingLibraryVideo ? image.scaleAndResize(forRect: frame, and: contentMode) : image)
     }
 
